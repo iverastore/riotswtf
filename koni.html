@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>koni — riots.wtf</title>
+  <meta name="description" content="koni · riots.wtf" />
+  <link rel="icon" href="pfp.png" />
+  <meta property="og:title" content="koni" />
+  <meta property="og:image" content="pfp.png" />
+  <meta name="theme-color" content="#ff2b2b" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --red: #ff2b2b;
+      --red-2: #ff5a4d;
+      --text: #f4f4f6;
+      --muted: #b7b7c2;
+      --card: rgba(16, 16, 20, 0.55);
+      --line: rgba(255, 255, 255, 0.12);
+      --glow: rgba(255, 43, 43, 0.55);
+      --font: 'Inter', system-ui, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px 16px;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+    }
+
+    /* ---- Background: background.png, blurred + darkened ---- */
+    .bg {
+      position: fixed; inset: -40px; z-index: -2;
+      background: #060606 url('background.png') center/cover no-repeat;
+      filter: blur(14px) brightness(0.5) saturate(1.1);
+      transform: scale(1.08);
+    }
+    .bg-tint {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        radial-gradient(700px 500px at 50% 0%, rgba(255,43,43,0.20), transparent 70%),
+        radial-gradient(900px 700px at 100% 100%, rgba(255,43,43,0.10), transparent 70%),
+        linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.6));
+    }
+
+    /* ---- Card ---- */
+    .card {
+      position: relative;
+      width: min(420px, 100%);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      padding: 74px 26px 26px;
+      margin-top: 54px;
+      backdrop-filter: blur(22px) saturate(1.2);
+      -webkit-backdrop-filter: blur(22px) saturate(1.2);
+      box-shadow: 0 30px 90px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
+      text-align: center;
+      animation: card-in .7s cubic-bezier(.2,.8,.2,1) both;
+    }
+    @keyframes card-in { from { opacity: 0; transform: translateY(22px) scale(.97); } }
+    /* animated gradient ring around the card */
+    .card::before {
+      content: ""; position: absolute; inset: -1px; border-radius: 27px; z-index: -1;
+      padding: 1px; pointer-events: none;
+      background: linear-gradient(135deg, rgba(255,90,77,.55), transparent 40%, transparent 60%, rgba(255,43,43,.45));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+    }
+
+    /* ---- Avatar (pfp.png) ---- */
+    .pfp-wrap {
+      position: absolute; top: -54px; left: 50%; transform: translateX(-50%);
+    }
+    .pfp {
+      width: 108px; height: 108px; border-radius: 50%;
+      object-fit: cover; display: block;
+      border: 3px solid rgba(255,255,255,0.9);
+      box-shadow: 0 0 0 4px rgba(255,43,43,0.35), 0 12px 40px rgba(255,43,43,0.4);
+      animation: pfp-float 5s ease-in-out infinite, pfp-glow 3.5s ease-in-out infinite;
+    }
+    @keyframes pfp-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes pfp-glow {
+      0%,100% { box-shadow: 0 0 0 4px rgba(255,43,43,0.30), 0 10px 34px rgba(255,43,43,0.35); }
+      50%     { box-shadow: 0 0 0 5px rgba(255,90,77,0.5), 0 14px 48px rgba(255,43,43,0.6); }
+    }
+    .pfp-ring {
+      position: absolute; inset: -8px; border-radius: 50%; pointer-events: none;
+      border: 2px solid transparent;
+      background: conic-gradient(from 0deg, var(--red), var(--red-2), #fff, var(--red)) border-box;
+      -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      animation: spin 6s linear infinite; opacity: .8;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status-dot {
+      position: absolute; right: 8px; bottom: 8px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #35d07f; border: 3px solid #101014;
+      box-shadow: 0 0 10px rgba(53,208,127,.8);
+    }
+
+    /* ---- Name with shimmer ---- */
+    .name {
+      font-size: 28px; font-weight: 900; letter-spacing: -0.5px;
+      display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+      background: linear-gradient(100deg, #fff 20%, var(--red-2) 40%, #fff 55%, var(--red) 70%, #fff 90%);
+      background-size: 220% auto;
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      animation: shimmer 4s linear infinite;
+    }
+    @keyframes shimmer { to { background-position: 220% center; } }
+    .verified { width: 20px; height: 20px; -webkit-text-fill-color: initial; }
+    .verified svg { width: 20px; height: 20px; display: block; filter: drop-shadow(0 0 6px rgba(255,43,43,.6)); }
+
+    /* ---- Bio with subtle shimmer ---- */
+    .bio {
+      margin-top: 8px; font-size: 14.5px; line-height: 1.55; font-weight: 500;
+      background: linear-gradient(100deg, var(--muted) 30%, #fff 50%, var(--muted) 70%);
+      background-size: 220% auto;
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      animation: shimmer 6s linear infinite;
+    }
+
+    /* ---- Stats ---- */
+    .stats {
+      display: flex; justify-content: center; gap: 10px; margin-top: 16px; flex-wrap: wrap;
+    }
+    .stat {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--line);
+      padding: 7px 13px; border-radius: 99px; font-size: 12.5px; font-weight: 600; color: var(--muted);
+    }
+    .stat b { color: #fff; font-weight: 800; }
+    .stat svg { width: 14px; height: 14px; opacity: .85; }
+
+    /* ---- Socials ---- */
+    .socials { display: flex; justify-content: center; gap: 12px; margin-top: 20px; }
+    .social {
+      width: 46px; height: 46px; border-radius: 14px;
+      display: grid; place-items: center;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--line);
+      color: #fff; transition: transform .2s, background .2s, border-color .2s, box-shadow .2s;
+    }
+    .social svg { width: 21px; height: 21px; }
+    .social:hover {
+      transform: translateY(-4px) scale(1.06);
+      background: rgba(255,43,43,0.14); border-color: rgba(255,43,43,0.5);
+      box-shadow: 0 10px 26px rgba(255,43,43,0.3);
+    }
+
+    /* ---- Link buttons ---- */
+    .links { display: flex; flex-direction: column; gap: 11px; margin-top: 22px; }
+    .link {
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; gap: 13px;
+      padding: 14px 16px; border-radius: 15px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--line);
+      color: #fff; font-weight: 600; font-size: 14.5px;
+      transition: transform .18s, background .2s, border-color .2s, box-shadow .2s;
+    }
+    .link .l-ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: rgba(255,43,43,0.14); color: var(--red-2); flex-shrink: 0; }
+    .link .l-ico svg { width: 18px; height: 18px; }
+    .link .l-text { text-align: left; line-height: 1.2; }
+    .link .l-text small { display: block; color: var(--muted); font-weight: 500; font-size: 12px; margin-top: 2px; }
+    .link .l-arrow { margin-left: auto; color: var(--muted); transition: transform .2s, color .2s; }
+    .link:hover {
+      transform: translateY(-2px);
+      background: rgba(255,43,43,0.10); border-color: rgba(255,43,43,0.5);
+      box-shadow: 0 10px 30px rgba(255,43,43,0.22);
+    }
+    .link:hover .l-arrow { transform: translateX(4px); color: #fff; }
+    /* sheen sweep */
+    .link::after {
+      content: ""; position: absolute; top: 0; left: -120%; width: 60%; height: 100%;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,0.14), transparent);
+      transform: skewX(-18deg); transition: left .6s;
+    }
+    .link:hover::after { left: 140%; }
+
+    /* ---- Music player ---- */
+    .player {
+      position: relative; margin-top: 22px;
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px; border-radius: 18px;
+      background: rgba(0,0,0,0.35); border: 1px solid var(--line);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .album {
+      position: relative; width: 62px; height: 62px; border-radius: 12px; flex-shrink: 0;
+      background: #0a0a0c center/cover no-repeat; overflow: hidden;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.5);
+    }
+    .album img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .album.playing img { animation: spin 8s linear infinite; }
+    .player-mid { flex: 1; min-width: 0; text-align: left; }
+    .track-name { font-weight: 700; font-size: 13.5px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .track-artist { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+    .progress { margin-top: 9px; display: flex; align-items: center; gap: 8px; }
+    .bar { flex: 1; height: 5px; border-radius: 99px; background: rgba(255,255,255,0.12); cursor: pointer; position: relative; }
+    .bar-fill { position: absolute; left: 0; top: 0; height: 100%; width: 0%; border-radius: 99px; background: linear-gradient(90deg, var(--red-2), var(--red)); }
+    .time { font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 32px; }
+    .play-btn {
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; border: none; cursor: pointer;
+      background: linear-gradient(135deg, var(--red-2), var(--red)); color: #fff;
+      display: grid; place-items: center; box-shadow: 0 8px 22px rgba(255,43,43,0.45);
+      transition: transform .15s;
+    }
+    .play-btn:hover { transform: scale(1.08); }
+    .play-btn svg { width: 20px; height: 20px; }
+
+    /* ---- Like widget (top-right) ---- */
+    .like {
+      position: absolute; top: 12px; right: 12px; z-index: 3;
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 13px; border-radius: 99px; cursor: pointer; user-select: none;
+      background: rgba(0,0,0,0.4); border: 1px solid var(--line);
+      color: #fff; font-weight: 700; font-size: 13px;
+      backdrop-filter: blur(10px); transition: transform .15s, border-color .2s, background .2s;
+    }
+    .like:hover { transform: scale(1.05); border-color: rgba(255,43,43,0.5); }
+    .like svg { width: 17px; height: 17px; transition: transform .2s; }
+    .like.liked { background: rgba(255,43,43,0.18); border-color: rgba(255,43,43,0.6); }
+    .like.liked svg { fill: var(--red); color: var(--red); animation: pop .35s ease; }
+    @keyframes pop { 0% { transform: scale(1); } 45% { transform: scale(1.45); } 100% { transform: scale(1); } }
+
+    .card-title {
+      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      font-size: 11px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--muted); white-space: nowrap;
+    }
+    .footer { margin-top: 18px; font-size: 11.5px; color: var(--muted); }
+    .footer a { color: var(--red-2); font-weight: 600; }
+
+    @media (max-width: 380px) {
+      .card { padding: 70px 18px 20px; }
+      .name { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="bg-tint"></div>
+
+  <!-- Like widget lives top-right, outside the card so it floats over it -->
+  <main class="card">
+    <button class="like" id="likeBtn" type="button" aria-label="Like">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+      <span id="likeCount">0</span>
+    </button>
+
+    <div class="card-title">riots.wtf</div>
+
+    <div class="pfp-wrap">
+      <div class="pfp-ring"></div>
+      <img src="pfp.png" alt="koni" class="pfp" />
+      <span class="status-dot" title="Online"></span>
+    </div>
+
+    <div class="name">
+      koni
+      <span class="verified" title="Verified">
+        <svg viewBox="0 0 24 24" fill="#ff2b2b"><path d="M12 2l2.4 1.8 3-.2 1 2.8 2.4 1.8-1 2.8 1 2.8-2.4 1.8-1 2.8-3-.2L12 22l-2.4-1.8-3 .2-1-2.8L3.2 14l1-2.8-1-2.8 2.4-1.8 1-2.8 3 .2L12 2z"/><path d="M10.6 14.6l-2.2-2.2 1.1-1.1 1.1 1.1 3.3-3.3 1.1 1.1-4.4 4.4z" fill="#fff"/></svg>
+      </span>
+    </div>
+
+    <p class="bio">the #1 market for your playstyle. keys · scripts · software, updated & UD every day.</p>
+
+    <div class="stats">
+      <span class="stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><b id="viewCount">0</b> views</span>
+      <span class="stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> riots.wtf</span>
+    </div>
+
+    <!-- Social icons -->
+    <div class="socials">
+      <a class="social" href="https://discord.gg/m7Z9Jyp6pf" aria-label="Discord" title="Discord">
+        <svg viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15ZM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69Zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69Z"/></svg>
+      </a>
+      <a class="social" href="https://www.tiktok.com/@riots.wtf" aria-label="TikTok" title="TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 5.6a4.9 4.9 0 0 1-1.15-2.6H12.4v11.9a2.6 2.6 0 1 1-2.15-2.56V9.4A5.4 5.4 0 1 0 15.2 15V9.05a7.6 7.6 0 0 0 4.3 1.33V7.4a4.9 4.9 0 0 1-3-1.8Z"/></svg>
+      </a>
+      <a class="social" href="https://www.youtube.com/@riotsoffical" aria-label="YouTube" title="YouTube">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.5a3 3 0 0 0-2.1-2.1C19.5 3.9 12 3.9 12 3.9s-7.5 0-9.4.5A3 3 0 0 0 .5 6.5 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.5 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.5ZM9.6 15.6V8.4l6.2 3.6-6.2 3.6Z"/></svg>
+      </a>
+      <a class="social" href="/products" aria-label="Store" title="Store / Website">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/><path d="M3 9h18"/><path d="M9 13h6"/></svg>
+      </a>
+    </div>
+
+    <!-- Link buttons -->
+    <div class="links">
+      <a class="link" href="/products">
+        <span class="l-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.6 13a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg></span>
+        <span class="l-text">Browse the store<small>Keys, scripts &amp; software</small></span>
+        <span class="l-arrow"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <a class="link" href="https://discord.gg/m7Z9Jyp6pf">
+        <span class="l-ico"><svg viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15ZM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69Zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69Z"/></svg></span>
+        <span class="l-text">Join the Discord<small>Support &amp; community</small></span>
+        <span class="l-arrow"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <a class="link" href="/">
+        <span class="l-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></span>
+        <span class="l-text">riots.wtf home<small>The main site</small></span>
+        <span class="l-arrow"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+    </div>
+
+    <!-- Music player -->
+    <div class="player">
+      <div class="album" id="album">
+        <img src="album.png" alt="album art" />
+      </div>
+      <div class="player-mid">
+        <div class="track-name" id="trackName">Now playing</div>
+        <div class="track-artist" id="trackArtist">koni</div>
+        <div class="progress">
+          <span class="time" id="curTime">0:00</span>
+          <div class="bar" id="bar"><div class="bar-fill" id="barFill"></div></div>
+          <span class="time" id="durTime">0:00</span>
+        </div>
+      </div>
+      <button class="play-btn" id="playBtn" type="button" aria-label="Play">
+        <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    </div>
+
+    <audio id="audio" src="audio.mp3" preload="metadata"></audio>
+
+    <p class="footer">© 2026 <a href="/">riots.wtf</a> · made with 🔴</p>
+  </main>
+
+  <script src="config.js"></script>
+  <script>
+    (function () {
+      var LS = window.localStorage;
+      var SLUG = 'koni';
+      var API = (window.RIOTS_API_BASE || '').replace(/\/$/, '');
+      var TOKEN = window.RIOTS_CLIENT_TOKEN || '';
+
+      function apiFetch(path, opts) {
+        opts = opts || {};
+        var headers = { 'Content-Type': 'application/json' };
+        if (TOKEN) headers['x-client-token'] = TOKEN;
+        return fetch(API + path, {
+          method: opts.method || 'GET',
+          headers: headers,
+          body: opts.body ? JSON.stringify(opts.body) : undefined,
+        }).then(function (r) { return r.json(); });
+      }
+
+      var viewEl = document.getElementById('viewCount');
+      var likeBtn = document.getElementById('likeBtn');
+      var likeCountEl = document.getElementById('likeCount');
+      var liked = LS.getItem('koni_liked') === '1';
+
+      function paint(bio) {
+        if (!bio) return;
+        if (typeof bio.views === 'number') animateCount(viewEl, bio.views);
+        if (typeof bio.likes === 'number') likeCountEl.textContent = fmt(bio.likes);
+      }
+
+      // Register a real view once per browser session, then paint real counts.
+      var alreadyViewed = LS.getItem('koni_viewed_session') === '1';
+      var viewCall = (API && !alreadyViewed)
+        ? apiFetch('/api/content/bio/' + SLUG + '/view', { method: 'POST' })
+        : (API ? apiFetch('/api/content/bio/' + SLUG) : Promise.resolve(null));
+
+      if (API && !alreadyViewed) LS.setItem('koni_viewed_session', '1');
+
+      viewCall
+        .then(function (res) { paint(res && res.bio); })
+        .catch(function () { /* backend unreachable — leave at 0 */ });
+
+      likeBtn.classList.toggle('liked', liked);
+      likeBtn.addEventListener('click', function () {
+        if (!API) return;
+        liked = !liked;
+        LS.setItem('koni_liked', liked ? '1' : '0');
+        likeBtn.classList.toggle('liked', liked);
+        apiFetch('/api/content/bio/' + SLUG + '/like', { method: 'POST', body: { liked: liked } })
+          .then(function (res) { paint(res && res.bio); })
+          .catch(function () {});
+      });
+
+      function animateCount(el, target) {
+        var start = 0, dur = 900, t0 = performance.now();
+        function step(now) {
+          var p = Math.min(1, (now - t0) / dur);
+          var eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = fmt(Math.round(target * eased));
+          if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
+      function fmt(n) { return n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(n); }
+
+      /* ---- Music player ---- */
+      var audio = document.getElementById('audio');
+      var playBtn = document.getElementById('playBtn');
+      var playIcon = document.getElementById('playIcon');
+      var album = document.getElementById('album');
+      var barFill = document.getElementById('barFill');
+      var bar = document.getElementById('bar');
+      var curTime = document.getElementById('curTime');
+      var durTime = document.getElementById('durTime');
+      var ICON_PLAY = '<path d="M8 5v14l11-7z"/>';
+      var ICON_PAUSE = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
+
+      playBtn.addEventListener('click', function () {
+        if (audio.paused) {
+          var p = audio.play();
+          if (p && p.catch) p.catch(function () {/* autoplay/format blocked */});
+        } else {
+          audio.pause();
+        }
+      });
+      audio.addEventListener('play', function () {
+        playIcon.innerHTML = ICON_PAUSE;
+        playBtn.setAttribute('aria-label', 'Pause');
+        album.classList.add('playing');
+      });
+      audio.addEventListener('pause', function () {
+        playIcon.innerHTML = ICON_PLAY;
+        playBtn.setAttribute('aria-label', 'Play');
+        album.classList.remove('playing');
+      });
+      audio.addEventListener('loadedmetadata', function () {
+        durTime.textContent = time(audio.duration);
+      });
+      audio.addEventListener('timeupdate', function () {
+        if (!audio.duration) return;
+        var pct = (audio.currentTime / audio.duration) * 100;
+        barFill.style.width = pct + '%';
+        curTime.textContent = time(audio.currentTime);
+      });
+      audio.addEventListener('ended', function () {
+        barFill.style.width = '0%';
+        curTime.textContent = '0:00';
+      });
+      bar.addEventListener('click', function (e) {
+        if (!audio.duration) return;
+        var rect = bar.getBoundingClientRect();
+        var ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+        audio.currentTime = ratio * audio.duration;
+      });
+      function time(s) {
+        if (!s || isNaN(s)) return '0:00';
+        var m = Math.floor(s / 60), sec = Math.floor(s % 60);
+        return m + ':' + (sec < 10 ? '0' : '') + sec;
+      }
+    })();
+  </script>
+</body>
+</html>
